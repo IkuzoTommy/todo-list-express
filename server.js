@@ -1,20 +1,20 @@
-const express = require('express')
+const express = require('express') // creates a variable that allows access to the database, also allows the use of all the installed dependiencies 
 const app = express()
 const MongoClient = require('mongodb').MongoClient
 const PORT = 2121
-require('dotenv').config()
+require('dotenv').config() // not neccessary to assign to a variable bc we dont need to use methods to use .env
 
 
-let db,
-    dbConnectionStr = process.env.DB_STRING,
+let db, //establishes database connection and assigning them to variables for later use
+    dbConnectionStr = process.env.DB_STRING, // creates a variable that hides your DB connection string via the .env file folder
     dbName = 'todo'
 
-MongoClient.connect(dbConnectionStr, { useUnifiedTopology: true })
-    .then(client => {
-        console.log(`Connected to ${dbName} Database`)
-        db = client.db(dbName)
+MongoClient.connect(dbConnectionStr, { useUnifiedTopology: true }) //allows you to use the .connect method on the MongoClinet variable created earlier to access your connection string. Using the useUnifiedTopology setting to blend mongo and server code.
+    .then(client => { //outlines instructions to be carried out after connection to the database is establised.
+        console.log(`Connected to ${dbName} Database`) // prints the db's name as to verify connection
+        db = client.db(dbName) 
     })
-    
+// setting the middleware to process CRUD operations 
 app.set('view engine', 'ejs')
 app.use(express.static('public'))
 app.use(express.urlencoded({ extended: true }))
