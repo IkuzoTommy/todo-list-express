@@ -14,17 +14,18 @@ MongoClient.connect(dbConnectionStr, { useUnifiedTopology: true }) //allows you 
         console.log(`Connected to ${dbName} Database`) // prints the db's name as to verify connection
         db = client.db(dbName) 
     })
-// setting the middleware to process CRUD operations 
-app.set('view engine', 'ejs')
-app.use(express.static('public'))
+// setting the middleware to process C(post) R(get) U(put) D(delete) operations 
+app.set('view engine', 'ejs') // sets the view engine to ejs which will help create the "html" that the user will interact with.
+app.use(express.static('public')) // tells express to use everything in the public folder to help render the webpage.
 app.use(express.urlencoded({ extended: true }))
-app.use(express.json())
+app.use(express.json()) //allows express to parse through the json data that is recieved to be manipulated by javascript.
 
+//READ
+app.get('/',async (request, response)=>{ // the "/" signifies the index of our website. it then oulines an async function to handle the response from our database.
+    const todoItems = await db.collection('todos').find().toArray() // creates and assigns an array that will store the incoming data from the db. in this case a list of everything that needs to be done.
+    const itemsLeft = await db.collection('todos').countDocuments({completed: false}) // this variable will store all the todo items that are still considered not complete by the user.
+    response.render('index.ejs', { items: todoItems, left: itemsLeft }) // calls upon ejs to render html that will contain all todo items and items that are left which will be later styled by the linked style sheet.
 
-app.get('/',async (request, response)=>{
-    const todoItems = await db.collection('todos').find().toArray()
-    const itemsLeft = await db.collection('todos').countDocuments({completed: false})
-    response.render('index.ejs', { items: todoItems, left: itemsLeft })
     // db.collection('todos').find().toArray()
     // .then(data => {
     //     db.collection('todos').countDocuments({completed: false})
@@ -34,33 +35,33 @@ app.get('/',async (request, response)=>{
     // })
     // .catch(error => console.error(error))
 })
-
-app.post('/addTodo', (request, response) => {
-    db.collection('todos').insertOne({thing: request.body.todoItem, completed: false})
+//CREATE
+app.post('/addTodo', (request, response) => { // outlines another user request that can be expected for databse to handle and respond to.
+    db.collection('todos').insertOne({thing: request.body.todoItem, completed: false}) // targets the todos collection and then uses the .insertOne and request.body being the user input on the webpage and then converted to an object that is added to collection.
     .then(result => {
-        console.log('Todo Added')
-        response.redirect('/')
+        console.log('Todo Added') // confirms that the database has recieved the newly added item
+        response.redirect('/') // navigates to the index upon successfully adding something, performing another get request to show the newly added todo item.
     })
-    .catch(error => console.error(error))
+    .catch(error => console.error(error)) //throws an error if inccured. 
 })
-
-app.put('/markComplete', (request, response) => {
-    db.collection('todos').updateOne({thing: request.body.itemFromJS},{
-        $set: {
+//UPDATE
+app.put('/markComplete', (request, response) => { //outlines the next request to be expected handled by the db, they serve as routes to the client side js functions
+    db.collection('todos').updateOne({thing: request.body.itemFromJS},{ //similiar to insertOne method, only it adjusts an existing entries completeion status to complete, this removes it from the itemsLeft array.
+        $set: { // sets items completeion status to true, which is handled in the get request.
             completed: true
           }
     },{
-        sort: {_id: -1},
-        upsert: false
+        sort: {_id: -1}, // untouchable parameter, sorts items in decending order
+        upsert: false // disables new entries being created should the existing entry not be found.
     })
     .then(result => {
-        console.log('Marked Complete')
-        response.json('Marked Complete')
+        console.log('Marked Complete') //confirms in the console that the op was succesful.
+        response.json('Marked Complete') // updates the status on the client-side allowing for the updated status to be rendered on the page.
     })
     .catch(error => console.error(error))
 
 })
-
+//this step works the same way only updating the initial put request to show an imcomplete status instead
 app.put('/markUnComplete', (request, response) => {
     db.collection('todos').updateOne({thing: request.body.itemFromJS},{
         $set: {
@@ -71,23 +72,23 @@ app.put('/markUnComplete', (request, response) => {
         upsert: false
     })
     .then(result => {
-        console.log('Marked Complete')
-        response.json('Marked Complete')
+        console.log('Marked Incomplete')
+        response.json('Marked Incomplete')
     })
     .catch(error => console.error(error))
 
 })
-
+//DELETE
 app.delete('/deleteItem', (request, response) => {
-    db.collection('todos').deleteOne({thing: request.body.itemFromJS})
+    db.collection('todos').deleteOne({thing: request.body.itemFromJS}) //deletes the document from the todo collection
     .then(result => {
-        console.log('Todo Deleted')
-        response.json('Todo Deleted')
+        console.log('Todo Deleted') //prints to the console confirmation that the todo was deleted.
+        response.json('Todo Deleted') //updates client-side javascript
     })
     .catch(error => console.error(error))
 
 })
-
+// tells express to create a port and then specifies a port to use should the .env port not work
 app.listen(process.env.PORT || PORT, ()=>{
     console.log(`Server running on port ${PORT}`)
 })
