@@ -18,30 +18,38 @@
     <title>Document</title>
 </head>
 <body>
-    <h1>Todo List: </h1>
+    <!-- larget header, title of the page -->
+    <h1>Todo List: </h1> 
+    <!-- unordered list that will serve to contain the todo items on the page -->
     <ul class="todoItems">
+    <!-- ejs syntax for loop that will allow the page to respond to an unknown amount of list items created by the user -->
     <% for(let i=0; i < items.length; i++) {%>
+    <!-- begins defining list items that will be shown on the webpage after the user enters their desired to do item -->
         <li class="item">
+    <!-- conditional statement that checks if the todo item is complete or not, if it is completed it is given the class of 'completed' and represented differently via the linked style page. if not completed the item is simply shown on the page as a current todo item -->
             <% if(items[i].completed === true) {%>
                 <span class='completed'><%= items[i].thing %></span>
             <% }else{ %>
                 <span><%= items[i].thing %></span>
-            <% } %>    
+            <% } %> 
+    <!-- constant span represented on the page that will allow the user to delete any todo item that no longer serves them, bc it is within the for loop it will be created everytime the user adds a new todo item -->
             <span class='fa fa-trash'></span>
         </li>
     <% } %>
     </ul>
-
+    <!-- seperate category of items that are not yet marked complete, the ejs syntax loads all of the incomplete items as h2s'  -->
     <h2>Left to do: <%= left %></h2>
-
+    <!-- allows the user to add an item to their todo list -->
     <h2>Add A Todo:</h2>
-
+    <!-- this form collects the desired todo item referencing the addTodo function to be carried out upon form submission -->
     <form action="/addTodo" method="POST">
+    <!-- specifies that the user should be entering text into the field, and the place holder text that will remain in the input feild until altered is 'thing to do', also gives it a name that will reference the item fo ja manipulation -->
         <input type="text" placeholder="Thing To Do" name="todoItem">
+    <!-- creates a button that when pressed will carry out the spcified action of the addTodo function -->
         <input type="submit">
     </form>
     
-
+    <!-- links to the script src that the page will use to run the webpage -->
     <script src='js/main.js'></script>
 </body>
 </html>

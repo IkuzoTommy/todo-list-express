@@ -7,11 +7,11 @@ require('dotenv').config() // not neccessary to assign to a variable bc we dont 
 
 let db, //establishes database connection and assigning them to variables for later use
     dbConnectionStr = process.env.DB_STRING, // creates a variable that hides your DB connection string via the .env file folder
-    dbName = 'todo'
+    dbName = 'todo' //name of the db that is to be accessed
 
 MongoClient.connect(dbConnectionStr, { useUnifiedTopology: true }) //allows you to use the .connect method on the MongoClinet variable created earlier to access your connection string. Using the useUnifiedTopology setting to blend mongo and server code.
     .then(client => { //outlines instructions to be carried out after connection to the database is establised.
-        console.log(`Connected to ${dbName} Database`) // prints the db's name as to verify connection
+        console.log(`Connected to ${dbName} Database`) // prints the entered db's name as to verify connection
         db = client.db(dbName) 
     })
 // setting the middleware to process C(post) R(get) U(put) D(delete) operations 
@@ -36,7 +36,7 @@ app.get('/',async (request, response)=>{ // the "/" signifies the index of our w
     // .catch(error => console.error(error))
 })
 //CREATE
-app.post('/addTodo', (request, response) => { // outlines another user request that can be expected for databse to handle and respond to.
+app.post('/addTodo', (request, response) => { // routes to a function on client side js that will then be relayed to the server to carry out the specified action. 
     db.collection('todos').insertOne({thing: request.body.todoItem, completed: false}) // targets the todos collection and then uses the .insertOne and request.body being the user input on the webpage and then converted to an object that is added to collection.
     .then(result => {
         console.log('Todo Added') // confirms that the database has recieved the newly added item
