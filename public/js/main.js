@@ -15,21 +15,21 @@ Array.from(itemCompleted).forEach((element)=>{ // when items are marked complete
     element.addEventListener('click', markUnComplete) // assigns an event listener to items specifically in this class to beable to later unmark them as complete.
 })
 
-async function deleteItem(){
-    const itemText = this.parentNode.childNodes[1].innerText
-    try{
-        const response = await fetch('deleteItem', {
-            method: 'delete',
-            headers: {'Content-Type': 'application/json'},
-            body: JSON.stringify({
+async function deleteItem(){ // dispatched on click via event listener
+    const itemText = this.parentNode.childNodes[1].innerText // assigns current item in focus to a varible for later use.
+    try{ //happens first
+        const response = await fetch('deleteItem', { //promise awaits the servers response and runs the delete item function
+            method: 'delete', //deletes content
+            headers: {'Content-Type': 'application/json'}, //spcifies the content type that will be returned.
+            body: JSON.stringify({ //grabs the db object and converts it to a json object that is able to be parsed through.
               'itemFromJS': itemText
             })
           })
-        const data = await response.json()
+        const data = await response.json() //awaits 'response' to be completed and stores it into the 'data' variable
         console.log(data)
-        location.reload()
+        location.reload() //reloads the page on the client side
 
-    }catch(err){
+    }catch(err){ //if try fails this executes and console logs the err for debugging
         console.log(err)
     }
 }
